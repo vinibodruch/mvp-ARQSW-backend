@@ -36,20 +36,41 @@ func (h *MovieHandler) ListMovies(c *gin.Context) {
 	c.JSON(http.StatusOK, movies)
 }
 
-// CreateMovie adiciona um filme à watchlist
+// CreateMovie adiciona um filme à watchlist.
+// Se o filme foi deletado anteriormente (soft delete), restaura o registro em vez de inserir.
 func (h *MovieHandler) CreateMovie(c *gin.Context) {
-	var movie models.Movie
-	if err := c.ShouldBindJSON(&movie); err != nil {
+	var input models.Movie
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos"})
 		return
 	}
 
-	if err := h.DB.Create(&movie).Error; err != nil {
+	// Busca registro existente incluindo soft-deleted
+	var existing models.Movie
+	err := h.DB.Unscoped().Where("imdb_id = ?", input.ImdbID).First(&existing).Error
+
+	if err == nil {
+		if existing.DeletedAt.Valid {
+			// Restaura o registro deletado com os dados atuais
+			input.ID = existing.ID
+			input.IsWatched = false
+			input.PersonalRating = 0
+			h.DB.Unscoped().Save(&input)
+			h.DB.Unscoped().Model(&input).Update("deleted_at", nil)
+			c.JSON(http.StatusCreated, input)
+			return
+		}
+		// Registro ativo — já está na watchlist
 		c.JSON(http.StatusConflict, gin.H{"error": "Filme já existe na watchlist"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, movie)
+	if err := h.DB.Create(&input).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao salvar filme"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, input)
 }
 
 // UpdateMovie atualiza is_watched e/ou personal_rating de um filme

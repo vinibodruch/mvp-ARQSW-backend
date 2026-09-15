@@ -11,12 +11,18 @@ import (
 
 // omdbSearchResult representa o retorno da OMDb API
 type omdbSearchResult struct {
-	Title  string `json:"Title"`
-	Year   string `json:"Year"`
-	ImdbID string `json:"imdbID"`
-	Poster string `json:"Poster"`
+	Title    string `json:"Title"`
+	Year     string `json:"Year"`
+	ImdbID   string `json:"imdbID"`
+	Poster   string `json:"Poster"`
+	Rated    string `json:"Rated"`
+	Runtime  string `json:"Runtime"`
+	Plot     string `json:"Plot"`
+	Director string `json:"Director"`
+	Genre    string `json:"Genre"`
+	Actors   string `json:"Actors"`
 	Response string `json:"Response"`
-	Error  string `json:"Error"`
+	Error    string `json:"Error"`
 }
 
 // SearchMovie busca um filme na OMDb API e retorna os dados formatados
@@ -28,9 +34,9 @@ func SearchMovie(omdbKey string) gin.HandlerFunc {
 			return
 		}
 
-		url := fmt.Sprintf("http://www.omdbapi.com/?t=%s&apikey=%s", url.QueryEscape(title), omdbKey)
+		omdbURL := fmt.Sprintf("http://www.omdbapi.com/?t=%s&apikey=%s", url.QueryEscape(title), omdbKey)
 
-		resp, err := http.Get(url)
+		resp, err := http.Get(omdbURL)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao consultar OMDb"})
 			return
@@ -54,6 +60,12 @@ func SearchMovie(omdbKey string) gin.HandlerFunc {
 			"title":      result.Title,
 			"year":       result.Year,
 			"poster_url": result.Poster,
+			"rated":      result.Rated,
+			"runtime":    result.Runtime,
+			"plot":       result.Plot,
+			"director":   result.Director,
+			"genre":      result.Genre,
+			"actors":     result.Actors,
 		})
 	}
 }
