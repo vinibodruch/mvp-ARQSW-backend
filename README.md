@@ -37,22 +37,65 @@ O back-end atua como intermediário para não expor a chave da API no front-end.
 | PUT | `/api/movies/:id` | Atualiza `is_watched` e/ou `personal_rating` |
 | DELETE | `/api/movies/:id` | Remove filme da watchlist |
 
-## Executar com Docker
+## Executar com Docker Compose
 
-> Os comandos abaixo devem ser executados a partir do repositório do **front-end**, que contém o `docker-compose.yml`.
-
-```bash
-# Na pasta mvp-ARQSW-frontend
-docker compose up --build
-```
-
-Para rodar apenas o back-end isolado:
+O `docker-compose.yml` deste repositório sobe o stack completo (banco, backend e frontend). Os dois repositórios devem estar na mesma pasta pai.
 
 ```bash
 # Na pasta mvp-ARQSW-backend
+docker compose up --build
+
+# Rodar em segundo plano
+docker compose up --build -d
+
+# Parar os serviços
+docker compose down
+
+# Parar e remover o volume do banco de dados
+docker compose down -v
+```
+
+> O mesmo resultado é obtido rodando `docker compose up --build` na pasta `mvp-ARQSW-frontend`.
+
+## Containers individuais (sem Docker Compose)
+
+```bash
+# 1. Criar rede compartilhada
+docker network create watchlist-net
+
+# 2. Banco de dados
+docker run -d \
+  --name movie_db \
+  --network watchlist-net \
+  -e POSTGRES_USER=watchlist \
+  -e POSTGRES_PASSWORD=watchlist123 \
+  -e POSTGRES_DB=watchlist \
+  postgres:16-alpine
+
+# 3. Back-end (na pasta mvp-ARQSW-backend)
 docker build -t movie-watchlist-api .
-docker run -p 8080:8080 \
-  -e DATABASE_URL="postgres://user:pass@host:5432/watchlist" \
+docker run -d \
+  --name movie_backend \
+  --network watchlist-net \
+  -e DATABASE_URL="postgres://watchlist:watchlist123@movie_db:5432/watchlist" \
   -e OMDB_API_KEY="sua_chave_aqui" \
+  -e PORT=8080 \
   movie-watchlist-api
+
+# 4. Front-end (na pasta mvp-ARQSW-frontend)
+docker build -t movie-watchlist-frontend .
+docker run -d \
+  --name movie_frontend \
+  --network watchlist-net \
+  -p 3000:80 \
+  movie-watchlist-frontend
+```
+
+Após subir, acesse: **http://localhost:3000**
+
+Para parar e remover:
+
+```bash
+docker rm -f movie_frontend movie_backend movie_db
+docker network rm watchlist-net
 ```

@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: movie_db
+    environment:
+      POSTGRES_USER: watchlist
+      POSTGRES_PASSWORD: watchlist123
+      POSTGRES_DB: watchlist
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchlist"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie_backend
+    environment:
+      DATABASE_URL: postgres://watchlist:watchlist123@db:5432/watchlist
+      OMDB_API_KEY: ${OMDB_API_KEY}
+      PORT: 8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../mvp-ARQSW-frontend
+      dockerfile: Dockerfile
+    container_name: movie_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
