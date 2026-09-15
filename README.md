@@ -37,9 +37,24 @@ O back-end atua como intermediário para não expor a chave da API no front-end.
 | PUT | `/api/movies/:id` | Atualiza `is_watched` e/ou `personal_rating` |
 | DELETE | `/api/movies/:id` | Remove filme da watchlist |
 
+## Repositórios
+
+Este projeto é composto por dois repositórios que **devem estar clonados na mesma pasta pai** com os nomes exatos abaixo, pois os `docker-compose.yml` referenciam um ao outro via caminho relativo (`../`):
+
+```
+pasta-qualquer/
+├── mvp-ARQSW-backend/    ← https://github.com/vinibodruch/mvp-ARQSW-backend
+└── mvp-ARQSW-frontend/   ← https://github.com/vinibodruch/mvp-ARQSW-frontend
+```
+
+```bash
+git clone https://github.com/vinibodruch/mvp-ARQSW-backend
+git clone https://github.com/vinibodruch/mvp-ARQSW-frontend
+```
+
 ## Executar com Docker Compose
 
-O `docker-compose.yml` deste repositório sobe o stack completo (banco, backend e frontend). Os dois repositórios devem estar na mesma pasta pai.
+O `docker-compose.yml` deste repositório sobe o stack completo (banco, backend e frontend).
 
 ```bash
 # Na pasta mvp-ARQSW-backend
