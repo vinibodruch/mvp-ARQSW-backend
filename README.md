@@ -21,7 +21,8 @@ API REST desenvolvida em Go com Gin e GORM para gerenciar uma lista pessoal de f
 A API externa utilizada é a **OMDb API** (Open Movie Database).
 
 - Site: https://www.omdbapi.com
-- É pública e gratuita (requer cadastro para obter chave)
+- **Licença:** dados fornecidos sob licença [Creative Commons Attribution-NonCommercial 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — uso não comercial permitido com atribuição
+- **Cadastro:** obrigatório para obter chave de API (plano FREE: 1.000 req/dia, sem custo)
 - Rota consumida pelo back-end: `http://www.omdbapi.com/?t={titulo}&apikey={chave}`
 
 O back-end atua como intermediário para não expor a chave da API no front-end.
