@@ -15,6 +15,7 @@ services:
       retries: 5
 
   backend:
+    image: your-dockerhub-username/your-backend-image:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,6 +29,7 @@ services:
         condition: service_healthy
 
   frontend:
+    image: your-dockerhub-username/your-frontend-image:latest
     build:
       context: ../mvp-ARQSW-frontend
       dockerfile: Dockerfile
