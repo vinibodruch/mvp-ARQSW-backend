@@ -2,6 +2,24 @@
 
 API REST desenvolvida em Go com Gin e GORM para gerenciar uma lista pessoal de filmes.
 
+## Início Rápido
+
+Sem precisar compilar nada — o Docker Compose puxa as imagens prontas do DockerHub:
+
+```bash
+# Clone os dois repositórios na mesma pasta pai
+git clone https://github.com/vinibodruch/mvp-ARQSW-backend
+git clone https://github.com/vinibodruch/mvp-ARQSW-frontend
+
+# Entre na pasta do backend e suba o stack completo
+cd mvp-ARQSW-backend
+docker compose up -d
+```
+
+Acesse **http://localhost:3000**. Pronto.
+
+> `docker compose up` (sem `--build`) usa as imagens `bodruch/movie-backend:1.0.0` e `bodruch/movie-frontend:1.0.0` do DockerHub. Use `--build` apenas se quiser recompilar a partir do código-fonte local.
+
 ## Tecnologias
 
 - **Go 1.22** + **Gin** (roteamento)
